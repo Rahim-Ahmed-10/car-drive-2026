@@ -1,9 +1,13 @@
 const express = require('express');
+require('dotenv').config()
 const app = express();
 const port = 3000;
 
-// car-platform-side
-// car-platform-side36321
+// import dns from "dns";
+// dns.setDefaultResultOrder("ipv4first");
+
+
+
 
 const products = [
 
@@ -19,8 +23,8 @@ const products = [
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb://car-platform-side:car-platform-side36321@ac-joyu3f9-shard-00-00.0zaxi3z.mongodb.net:27017,ac-joyu3f9-shard-00-01.0zaxi3z.mongodb.net:27017,ac-joyu3f9-shard-00-02.0zaxi3z.mongodb.net:27017/?ssl=true&replicaSet=atlas-ju8gcw-shard-0&authSource=admin&appName=Cluster0";
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const uri =process.env.DB_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -36,7 +40,33 @@ async function server() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
+
+
+
+    const db =client.db("car-platform");
+    const productCollection = db.collection("carProducts");
+
+    app.get("/carProducts", async(req, res) =>{
+      const cursor= productCollection.find();
+      // console.log(cursor);
+      const result = await cursor.toArray();
+      // console.log(result);
+      res.send(result);
+    });
+
+    app.get("/carProducts/:carProductId", async(req, res) => {
+      const carProductId = req.params.carProductId;
+      console.log(carProductId);
+      const query = {_id:new ObjectId(carProductId)};
+      console.log(query);
+      const result = await productCollection.findOne(query);
+      console.log(result);
+      res.send(result);
+    })
+
+
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
