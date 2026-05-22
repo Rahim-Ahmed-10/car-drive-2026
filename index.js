@@ -1,7 +1,7 @@
 const express = require('express');
 require('dotenv').config()
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 8085;
 
 // import dns from "dns";
 // dns.setDefaultResultOrder("ipv4first");
@@ -57,11 +57,11 @@ async function server() {
 
     app.get("/carProducts/:carProductId", async(req, res) => {
       const carProductId = req.params.carProductId;
-      console.log(carProductId);
+      // console.log(carProductId);
       const query = {_id:new ObjectId(carProductId)};
-      console.log(query);
+      // console.log(query);
       const result = await productCollection.findOne(query);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     })
 
