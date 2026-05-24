@@ -35,6 +35,18 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+const logger = (req, res, next) => {
+      console.log(`${req.method} | ${req.url}`);
+      next();
+      }
+
+const verifyToken =async (req, res, next) => {
+console.log(req.headers)
+}
+
+
+
 async function server() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -55,14 +67,20 @@ async function server() {
       res.send(result);
     });
 
-    app.get("/carProducts/:carProductId", async(req, res) => {
-      const carProductId = req.params.carProductId;
-      // console.log(carProductId);
+    app.get("/carProducts/:carProductId",logger, verifyToken,async(req, res) => {
+      const {carProductId} = req.params;
+      console.log(carProductId);
       const query = {_id:new ObjectId(carProductId)};
       // console.log(query);
       const result = await productCollection.findOne(query);
-      // console.log(result);
-      res.send(result);
+      if(result){
+        // console.log("Data Found", result);
+        res.send(result);
+      }else{
+        // console.log("No data found for this id");
+        res.send(404).send({massage:"Data not found"})
+      }
+
     })
 
 
